@@ -1,13 +1,13 @@
 [package]
 name = "duckui"
 version = "0.0.1"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
-anyhow = "1.0"
+# anyhow = "1.0"
 duckdb = { version = "1.4.3", features = ["bundled"] }
-tao    = "0.24"
-wry    = "0.35"
+tao = "0.34"
+wry = "0.44"
 
 [profile.release]
 opt-level = "z"
