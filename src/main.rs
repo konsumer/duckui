@@ -59,6 +59,9 @@ fn run_setup_sql(conn: &Connection, setup_sql: &str) -> Result<()> {
 
 fn start_ui_server(conn: &Connection) -> Result<()> {
     println!("Starting DuckDB UI server...");
+    // Load the UI extension and configure it
+    conn.execute(&format!("SET ui_local_port = {}", DUCKDB_UI_PORT), [])
+        .context("Failed to set UI port")?;
     conn.execute("CALL start_ui_server()", [])
         .context("Failed to start UI server")?;
     println!("DuckDB UI server started on port {}", DUCKDB_UI_PORT);
@@ -77,17 +80,9 @@ fn initialize_database(proxy: EventLoopProxy<UserEvent>, is_first_run: bool) -> 
 
     if is_first_run {
         println!("First run detected, running setup...");
-
-        // Execute embedded setup.sql
         run_setup_sql(&conn, SETUP_SQL)?;
     } else {
-        println!("Database already exists, loading UI...");
-
-        // Just load the UI extension and configure it
-        conn.execute("LOAD ui", [])
-            .context("Failed to load UI extension")?;
-        conn.execute(&format!("SET ui_local_port = {}", DUCKDB_UI_PORT), [])
-            .context("Failed to set UI port")?;
+        println!("Database already exists...");
     }
 
     // Start the UI server

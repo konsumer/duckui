@@ -5,6 +5,9 @@ on:
     tags:
       - "*"
 
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -44,7 +47,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: x86_64-pc-windows-msvc
           override: true
 
       - name: Build and Package
@@ -84,6 +86,8 @@ jobs:
   create-release:
     needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -92,13 +96,15 @@ jobs:
         with:
           path: artifacts
 
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/macos-dmg/*.dmg
-            artifacts/windows-zip/*.zip
-            artifacts/linux-tarball/*.tar.gz
+            artifacts/macos-dmg/*
+            artifacts/windows-zip/*
+            artifacts/linux-tarball/*
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_unmatched_files: false

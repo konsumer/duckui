@@ -2,11 +2,20 @@
 
 $APP_NAME = "DuckUI"
 $VERSION = "0.0.1"
-$BUILD_DIR = "target\release"
 $DIST_DIR = "dist\windows"
 
-Write-Host "Building release for Windows..." -ForegroundColor Green
-cargo build --release --target x86_64-pc-windows-msvc
+# Check if a specific target was built, otherwise use default
+if (Test-Path "target\x86_64-pc-windows-msvc\release\duckui.exe") {
+    $BUILD_DIR = "target\x86_64-pc-windows-msvc\release"
+} else {
+    $BUILD_DIR = "target\release"
+}
+
+# Only build if binary doesn't exist
+if (-not (Test-Path "$BUILD_DIR\duckui.exe")) {
+    Write-Host "Building release for Windows..." -ForegroundColor Green
+    cargo build --release
+}
 
 Write-Host "Creating distribution directory..." -ForegroundColor Green
 if (Test-Path $DIST_DIR) {
