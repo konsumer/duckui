@@ -10,7 +10,23 @@ A quick way to run DuckDB UI after running some SQL setup, in a cross-platform w
 - ⚡ Fast startup with automatic database initialization
 - 📦 Customizable setup via SQL configuration
 
-## Quick Start
+## How It Works
+
+- Shows a loading screen while setting up
+- If first run, executes `setup.sql` to configure DuckDB UI & import any initial data
+- Starts DuckDB UI server on port 4213
+- Executes `runtime.sql` to do any runtime stuff (attach databases, etc.)
+- Redirects to the UI when ready
+
+## Database Location
+
+The database is stored in your user data directory:
+
+- **macOS**: `~/Library/Application Support/duckui/data.db`
+- **Windows**: `%LOCALAPPDATA%\duckui\data.db`
+- **Linux**: `~/.local/share/duckui/data.db`
+
+## Development
 
 ### Running from Source
 
@@ -28,7 +44,7 @@ powershell scripts/package-windows.ps1 # Windows .exe and .zip
 
 Output will be in the `dist/` directory.
 
-## Development Setup
+### Setup
 
 You will need Rust and some platform-specific dependencies:
 
@@ -56,23 +72,7 @@ xcode-select --install
 
 Download [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/).
 
-## How It Works
-
-- Shows a loading screen while setting up
-- If first run, executes `setup.sql` to configure DuckDB UI & import any initial data
-- Starts DuckDB UI server on port 4213
-- Executes `runtime.sql` to do any runtime stuff (attach databases, etc.)
-- Redirects to the UI when ready
-
-## Database Location
-
-The database is stored in your user data directory:
-
-- **macOS**: `~/Library/Application Support/duckui/data.db`
-- **Windows**: `%LOCALAPPDATA%\duckui\data.db`
-- **Linux**: `~/.local/share/duckui/data.db`
-
-## Customization
+### Customization
 
 Edit `setup.sql` & `runtime.sql` to add custom initialization commands:
 
@@ -82,7 +82,7 @@ CREATE TABLE titanic AS SELECT * FROM read_parquet('https://www.timestored.com/d
 
 The setup/runtime SQL & loading-screen HTML is embedded into the binary at compile time, if you want to customize things.
 
-## Releases
+### Releases
 
 See [PACKAGING.md](PACKAGING.md) for detailed packaging instructions.
 
