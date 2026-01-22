@@ -14,6 +14,7 @@ use wry::WebViewBuilder;
 const DUCKDB_UI_PORT: u16 = 4213;
 const LOADING_HTML: &str = include_str!("./loading.html");
 const SETUP_SQL: &str = include_str!("./setup.sql");
+const RUNTIME_SQL: &str = include_str!("./runtime.sql");
 
 #[derive(Debug, Clone)]
 enum UserEvent {
@@ -29,9 +30,7 @@ fn get_db_path() -> Result<PathBuf> {
     Ok(app_dir.join("data.db"))
 }
 
-fn run_setup_sql(conn: &Connection, setup_sql: &str) -> Result<()> {
-    println!("Running setup SQL...");
-
+fn run_inline_sql(conn: &Connection, setup_sql: &str) -> Result<()> {
     // Remove comments and split by semicolon
     for statement in setup_sql.split(';') {
         // Remove comment lines and trim
@@ -52,8 +51,6 @@ fn run_setup_sql(conn: &Connection, setup_sql: &str) -> Result<()> {
                 .with_context(|| format!("Failed to execute: {}", statement))?;
         }
     }
-
-    println!("Setup SQL completed");
     Ok(())
 }
 
@@ -80,10 +77,12 @@ fn initialize_database(proxy: EventLoopProxy<UserEvent>, is_first_run: bool) -> 
 
     if is_first_run {
         println!("First run detected, running setup...");
-        run_setup_sql(&conn, SETUP_SQL)?;
+        run_inline_sql(&conn, SETUP_SQL)?;
     } else {
         println!("Database already exists...");
     }
+
+    run_inline_sql(&conn, RUNTIME_SQL)?;
 
     // Start the UI server
     start_ui_server(&conn)?;
