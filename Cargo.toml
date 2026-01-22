@@ -1,0 +1,17 @@
+[package]
+name = "duckui"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0"
+duckdb = { version = "1.4.3", features = ["bundled"] }
+tao    = "0.24"
+wry    = "0.35"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
