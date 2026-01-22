@@ -4,10 +4,11 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-# anyhow = "1.0"
+anyhow = "1.0"
+dirs = "5.0"
 duckdb = { version = "1.4.3", features = ["bundled"] }
 tao = "0.34"
-wry = "0.44"
+wry = "0.54"
 
 [profile.release]
 opt-level = "z"
