@@ -23,20 +23,24 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Build and Package
-        run: bash scripts/package-macos.sh
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-app
-          path: dist/macos/DuckUI.app
+      - name: Build and Package
+        run: bash scripts/package-macos.sh "${{ steps.version.outputs.version }}"
+
+      - name: List dist directory
+        run: ls -la dist/macos
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: macos-dmg
-          path: dist/macos/*.dmg
+          path: dist/macos/DuckUI-${{ steps.version.outputs.version }}-macos.dmg
 
   build-windows:
     runs-on: windows-latest
@@ -49,14 +53,28 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Extract version
+        id: version
+        run: |
+          $VERSION = "${{ github.ref_name }}" -replace '^v', ''
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+        shell: powershell
+
       - name: Build and Package
-        run: powershell scripts/package-windows.ps1
+        run: powershell scripts/package-windows.ps1 "${{ steps.version.outputs.version }}"
+
+      - name: List dist directory
+        run: |
+          echo "Listing dist/windows directory:"
+          dir dist\windows
+        shell: powershell
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows-zip
-          path: dist/windows/*.zip
+          path: dist/windows/DuckUI-${{ steps.version.outputs.version }}-windows-x64.zip
 
   build-linux:
     runs-on: ubuntu-latest
@@ -74,14 +92,24 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
       - name: Build and Package
-        run: bash scripts/package-linux.sh
+        run: bash scripts/package-linux.sh "${{ steps.version.outputs.version }}"
+
+      - name: List dist directory
+        run: ls -la dist/linux
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-tarball
-          path: dist/linux/*.tar.gz
+          path: dist/linux/duckui-${{ steps.version.outputs.version }}-linux-x64.tar.gz
 
   create-release:
     needs: [build-macos, build-windows, build-linux]
@@ -90,6 +118,13 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -103,8 +138,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/macos-dmg/*
-            artifacts/windows-zip/*
-            artifacts/linux-tarball/*
+            artifacts/macos-dmg/DuckUI-${{ steps.version.outputs.version }}-macos.dmg
+            artifacts/windows-zip/DuckUI-${{ steps.version.outputs.version }}-windows-x64.zip
+            artifacts/linux-tarball/duckui-${{ steps.version.outputs.version }}-linux-x64.tar.gz
           generate_release_notes: true
-          fail_on_unmatched_files: false
+          fail_on_unmatched_files: true

@@ -1,20 +1,34 @@
 # Windows packaging script for DuckUI
 
 $APP_NAME = "DuckUI"
-$VERSION = "0.0.1"
-$DIST_DIR = "dist\windows"
 
-# Check if a specific target was built, otherwise use default
-if (Test-Path "target\x86_64-pc-windows-msvc\release\duckui.exe") {
-    $BUILD_DIR = "target\x86_64-pc-windows-msvc\release"
+# Get version from parameter or git tag, fallback to 0.0.1-dev if no tag
+if ($args.Count -gt 0) {
+    $VERSION = $args[0]
 } else {
-    $BUILD_DIR = "target\release"
+    try {
+        $VERSION = (git describe --tags --abbrev=0 2>$null)
+        if (-not $VERSION) {
+            $VERSION = "0.0.1-dev"
+        }
+    } catch {
+        $VERSION = "0.0.1-dev"
+    }
 }
 
-# Only build if binary doesn't exist
+# Remove 'v' prefix if present
+$VERSION = $VERSION -replace '^v', ''
+
+$BUILD_DIR = "target\release"
+$DIST_DIR = "dist\windows"
+
+Write-Host "Building version: $VERSION" -ForegroundColor Green
+Write-Host "Building release for Windows..." -ForegroundColor Green
+cargo build --release
+
 if (-not (Test-Path "$BUILD_DIR\duckui.exe")) {
-    Write-Host "Building release for Windows..." -ForegroundColor Green
-    cargo build --release
+    Write-Host "❌ Build failed: Binary not found at $BUILD_DIR\duckui.exe" -ForegroundColor Red
+    exit 1
 }
 
 Write-Host "Creating distribution directory..." -ForegroundColor Green
@@ -35,3 +49,9 @@ Compress-Archive -Path "$DIST_DIR\$APP_NAME.exe" -DestinationPath $zipPath
 
 Write-Host "✅ Windows package created: $zipPath" -ForegroundColor Green
 Write-Host "   Executable: $DIST_DIR\$APP_NAME.exe" -ForegroundColor Gray
+
+# Verify the zip was created
+if (-not (Test-Path $zipPath)) {
+    Write-Host "❌ Zip file was not created!" -ForegroundColor Red
+    exit 1
+}

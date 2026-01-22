@@ -2,15 +2,12 @@
 
 This document describes how to build and package DuckUI for distribution.
 
-## Quick Start
+## Versioning
 
-Run the unified packaging script:
-
-```bash
-bash scripts/package.sh
-```
-
-This will automatically detect your OS and create the appropriate package in the `dist/` directory.
+All packaging scripts automatically detect the version from git tags:
+- If a git tag exists (e.g., `v0.1.0`), it uses that version
+- Otherwise, it defaults to `0.0.1-dev`
+- You can also pass a version explicitly: `bash scripts/package-macos.sh 1.2.3`
 
 ## Platform-Specific Instructions
 
@@ -19,24 +16,32 @@ This will automatically detect your OS and create the appropriate package in the
 Creates a `.app` bundle and `.dmg` installer:
 
 ```bash
+# Uses version from git tag
 bash scripts/package-macos.sh
+
+# Or specify a version
+bash scripts/package-macos.sh 1.2.3
 ```
 
 Output:
 - `dist/macos/DuckUI.app` - Application bundle (can be dragged to Applications)
-- `dist/macos/DuckUI-0.0.1-macos.dmg` - DMG installer
+- `dist/macos/DuckUI-{VERSION}-macos.dmg` - DMG installer
 
 ### Windows
 
 Creates a standalone `.exe`:
 
 ```bash
+# Uses version from git tag
 powershell scripts/package-windows.ps1
+
+# Or specify a version
+powershell scripts/package-windows.ps1 1.2.3
 ```
 
 Output:
 - `dist/windows/DuckUI.exe` - Standalone executable
-- `dist/windows/DuckUI-0.0.1-windows-x64.zip` - Zip archive
+- `dist/windows/DuckUI-{VERSION}-windows-x64.zip` - Zip archive
 
 **Requirements:**
 - Rust with `x86_64-pc-windows-msvc` target installed
@@ -46,11 +51,15 @@ Output:
 Creates a tarball with the binary:
 
 ```bash
+# Uses version from git tag
 bash scripts/package-linux.sh
+
+# Or specify a version
+bash scripts/package-linux.sh 1.2.3
 ```
 
 Output:
-- `dist/linux/duckui-0.0.1-linux-x64.tar.gz` - Tarball with binary
+- `dist/linux/duckui-{VERSION}-linux-x64.tar.gz` - Tarball with binary
 
 **Requirements:**
 - WebKitGTK development libraries (`libwebkit2gtk-4.1-dev` on Ubuntu/Debian)

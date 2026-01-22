@@ -3,9 +3,14 @@ set -e
 
 APP_NAME="DuckUI"
 BUNDLE_ID="com.duckui.app"
-VERSION="0.0.1"
+# Get version from git tag, fallback to 0.0.1-dev if no tag
+VERSION="${1:-$(git describe --tags --abbrev=0 2>/dev/null || echo '0.0.1-dev')}"
+# Remove 'v' prefix if present
+VERSION="${VERSION#v}"
 BUILD_DIR="target/release"
 DIST_DIR="dist/macos"
+
+echo "Building version: ${VERSION}"
 
 echo "Building release for macOS..."
 cargo build --release
