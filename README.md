@@ -60,13 +60,15 @@ Download [Visual Studio Build Tools](https://visualstudio.microsoft.com/download
 
 1. **First Run**:
    - Shows a loading screen while setting up
-   - Executes `setup.sql` to configure DuckDB UI
+   - Executes `setup.sql` to configure DuckDB UI & import any data
    - Starts DuckDB UI server on port 4213
+   - Executes `runtime.sql` to do any runtime stuff (attach databases, etc.)
    - Redirects to the UI when ready
 
 2. **Subsequent Runs**:
    - Opens existing database
    - Shows brief loading screen while server starts
+   - Executes `runtime.sql` to do any runtime stuff (attach databases, etc.)
    - Navigates to UI when ready
 
 ## Database Location
