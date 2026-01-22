@@ -74,13 +74,13 @@ The database is stored in your user data directory:
 
 ## Customization
 
-Edit `setup.sql` to add custom initialization commands:
+Edit `setup.sql` & `runtime.sql` to add custom initialization commands:
 
 ```sql
 CREATE TABLE titanic AS SELECT * FROM read_parquet('https://www.timestored.com/data/sample/titanic.parquet');
 ```
 
-The setup SQL & loading-screen HTML is embedded into the binary at compile time, if you want to customize things.
+The setup/runtime SQL & loading-screen HTML is embedded into the binary at compile time, if you want to customize things.
 
 ## Releases
 
