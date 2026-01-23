@@ -11,6 +11,11 @@ use tao::{
 };
 use wry::WebViewBuilder;
 
+#[cfg(target_os = "linux")]
+use tao::platform::unix::WindowExtUnix;
+#[cfg(target_os = "linux")]
+use wry::WebViewBuilderExtUnix;
+
 const DUCKDB_UI_PORT: u16 = 4213;
 const LOADING_HTML: &str = include_str!("./loading.html");
 const SETUP_SQL: &str = include_str!("./setup.sql");
@@ -115,10 +120,21 @@ fn main() {
         .expect("Failed to create window");
 
     // Always show loading screen initially to avoid race condition
+    // On Linux, use GTK for proper Wayland support
+    #[cfg(not(target_os = "linux"))]
     let webview = WebViewBuilder::new()
         .with_html(LOADING_HTML)
         .build(&window)
         .expect("Failed to build webview");
+
+    #[cfg(target_os = "linux")]
+    let webview = {
+        let vbox = window.default_vbox().expect("Failed to get vbox from window");
+        WebViewBuilder::new()
+            .with_html(LOADING_HTML)
+            .build_gtk(vbox)
+            .expect("Failed to build webview")
+    };
 
     // Initialize database in background thread
     thread::spawn(move || {

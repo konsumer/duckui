@@ -11,7 +11,7 @@ DIST_DIR="dist/linux"
 
 echo "Building version: ${VERSION}"
 echo "Building release for Linux..."
-cargo build --release
+cargo build --release $DUCKUI_OPTIONS
 
 echo "Creating distribution directory..."
 rm -rf "${DIST_DIR}"

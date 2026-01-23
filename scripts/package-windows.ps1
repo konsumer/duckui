@@ -24,7 +24,7 @@ $DIST_DIR = "dist\windows"
 
 Write-Host "Building version: $VERSION" -ForegroundColor Green
 Write-Host "Building release for Windows..." -ForegroundColor Green
-cargo build --release
+cargo build --release $DUCKUI_OPTIONS
 
 if (-not (Test-Path "$BUILD_DIR\duckui.exe")) {
     Write-Host "❌ Build failed: Binary not found at $BUILD_DIR\duckui.exe" -ForegroundColor Red

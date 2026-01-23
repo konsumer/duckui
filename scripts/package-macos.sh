@@ -13,7 +13,7 @@ DIST_DIR="dist/macos"
 echo "Building version: ${VERSION}"
 
 echo "Building release for macOS..."
-cargo build --release
+cargo build --release $DUCKUI_OPTIONS
 
 echo "Creating app bundle structure..."
 rm -rf "${DIST_DIR}/${APP_NAME}.app"
